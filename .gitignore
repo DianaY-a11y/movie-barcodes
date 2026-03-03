@@ -1,0 +1,17 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# Node
+web/node_modules/
+
+# Output images
+output/
+
+# OS
+.DS_Store
