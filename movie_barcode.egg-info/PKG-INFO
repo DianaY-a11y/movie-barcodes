@@ -1,0 +1,138 @@
+Metadata-Version: 2.4
+Name: movie-barcode
+Version: 0.1.0
+Summary: Generate movie barcodes from video files using shot-aware K-means color extraction
+License: MIT
+Keywords: movie,barcode,color,film,visualization
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Multimedia :: Video
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: av>=12.0
+Requires-Dist: numpy>=1.26
+Requires-Dist: pillow>=10.0
+Requires-Dist: scikit-learn>=1.4
+Requires-Dist: typer[rich]>=0.12
+Requires-Dist: rich>=13.0
+Provides-Extra: dev
+Requires-Dist: pytest>=8.0; extra == "dev"
+Requires-Dist: pytest-cov>=5.0; extra == "dev"
+Dynamic: license-file
+
+# movie-barcode
+
+Generate a movie barcode from any video file — a visualization of a film's color palette over time as vertical stripes.
+
+## Installation
+
+```sh
+pip install -e .
+```
+
+## Usage
+
+```sh
+moviebarcode VIDEO [OPTIONS]
+```
+
+`VIDEO` is the path to your video file (MP4, MKV, AVI, etc.). It is required.
+
+```sh
+moviebarcode movie.mp4
+moviebarcode /path/to/film.mkv -o barcode.png
+```
+
+## Options
+
+| Option | Default | Description |
+|---|---|---|
+| `VIDEO` | *(required)* | Path to the input video file |
+| `-o, --output PATH` | `<name>_barcode.png` | Output image path (PNG or JPEG) |
+| `-n, --stripes INT` | `500` | Number of vertical color stripes |
+| `-w, --stripe-width INT` | `3` | Pixel width of each stripe |
+| `--height INT` | `400` | Pixel height of the output image |
+| `--smooth INT` | `0` | Gaussian blur radius (0 = sharp stripes) |
+| `--mode TEXT` | `pretty` | Color extraction mode: `pretty` (K-means dominant), `vivid` (most saturated cluster), or `fast` (trimmed mean) |
+| `--k INT` | `3` | K-means clusters per shot (`pretty` mode only) |
+| `--sample-frames INT` | `5` | Frames sampled per shot for color extraction |
+| `--workers INT` | `1` | Parallel worker processes for color extraction |
+| `--sensitivity TEXT` | `medium` | Shot detection sensitivity: `low`, `medium`, or `high` |
+| `--no-letterbox` | off | Skip automatic letterbox (black bar) detection |
+| `--palette PATH` | *(none)* | Also save a dominant-color palette image to this path |
+| `--palette-colors INT` | `16` | Number of colors in the palette image |
+| `--start FLOAT` | `0.0` | Start time in seconds (e.g. skip opening credits) |
+| `--end FLOAT` | *(end of video)* | End time in seconds (e.g. skip closing credits) |
+| `--help` | | Show help and exit |
+
+## Examples
+
+**Basic — generate a barcode with defaults:**
+```sh
+moviebarcode movie.mp4
+# saves movie_barcode.png
+```
+
+**Custom output path and size:**
+```sh
+moviebarcode movie.mp4 -o output/barcode.png --stripes 800 --height 600
+```
+
+**Smooth gradient look:**
+```sh
+moviebarcode movie.mp4 --smooth 15
+```
+
+**Fast mode for long videos:**
+```sh
+moviebarcode movie.mp4 --mode fast --workers 4
+```
+
+**Skip credits (start at 2 min, end at 1h 55 min):**
+```sh
+moviebarcode movie.mp4 --start 120 --end 6900
+```
+
+**Also generate a color palette:**
+```sh
+moviebarcode movie.mp4 --palette palette.png --palette-colors 12
+```
+
+**High sensitivity shot detection (catches soft transitions):**
+```sh
+moviebarcode movie.mp4 --sensitivity high
+```
+
+**All options combined:**
+```sh
+moviebarcode film.mkv \
+  -o barcode.png \
+  --stripes 1000 \
+  --stripe-width 2 \
+  --height 500 \
+  --smooth 10 \
+  --mode pretty \
+  --k 5 \
+  --sample-frames 8 \
+  --workers 4 \
+  --sensitivity medium \
+  --start 120 \
+  --end 7080 \
+  --palette palette.png \
+  --palette-colors 16
+```
+
+## How It Works
+
+1. **Probe** — reads video metadata (duration, fps, resolution, codec)
+2. **Letterbox detection** — finds and crops horizontal black bars automatically
+3. **Shot detection** — identifies cut points using HSV histogram distances with adaptive thresholding
+4. **Color extraction** — samples frames per shot and finds the dominant color via K-means clustering in Lab color space (`pretty`) or a trimmed mean (`fast`)
+5. **Stripe blending** — blends shot colors into time-equal stripes, weighted by overlap duration
+6. **Render** — draws vertical stripes and saves the image
+
+## License
+
+MIT

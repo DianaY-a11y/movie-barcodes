@@ -1,0 +1,27 @@
+[
+  { "filename": "BrokebackMountain_vivid.webp",        "title": "Brokeback Mountain (2005)",        "director": "Ang Lee",        "mode": "vivid"  },
+  { "filename": "BrokebackMountain_natural.webp",       "title": "Brokeback Mountain (2005)",        "director": "Ang Lee",        "mode": "natural" },
+
+  { "filename": "FarewellMyConcubine_vivid.webp",      "title": "Farewell My Concubine (1993)",     "director": "Chen Kaige",     "mode": "vivid"  },
+  { "filename": "FarewellMyConcubine_natural.webp",     "title": "Farewell My Concubine (1993)",     "director": "Chen Kaige",     "mode": "natural" },
+
+  { "filename": "SpiritedAway_vivid.webp",             "title": "Spirited Away (2001)",             "director": "Hayao Miyazaki", "mode": "vivid"  },
+  { "filename": "SpiritedAway_natural.webp",            "title": "Spirited Away (2001)",             "director": "Hayao Miyazaki", "mode": "natural" },
+
+  { "filename": "LoveLetter_vivid.webp",               "title": "Love Letter (1995)",               "director": "Shunji Iwai",    "mode": "vivid"  },
+  { "filename": "LoveLetter_natural.webp",              "title": "Love Letter (1995)",               "director": "Shunji Iwai",    "mode": "natural" },
+
+  { "filename": "ChungkingExpress_vivid.webp",         "title": "Chungking Express (1994)",         "director": "Wong Kar-Wai",   "mode": "vivid"  },
+  { "filename": "ChungkingExpress_natural.webp",        "title": "Chungking Express (1994)",         "director": "Wong Kar-Wai",   "mode": "natural" },
+  { "filename": "InTheMoodForLove_vivid.webp",         "title": "In the Mood for Love (2000)",      "director": "Wong Kar-Wai",   "mode": "vivid"  },
+  { "filename": "InTheMoodForLove_natural.webp",        "title": "In the Mood for Love (2000)",      "director": "Wong Kar-Wai",   "mode": "natural" },
+
+  { "filename": "CurseOfTheGoldenFlower_vivid.webp",   "title": "Curse of the Golden Flower (2006)","director": "Zhang Yimou",    "mode": "vivid"  },
+  { "filename": "CurseOfTheGoldenFlower_natural.webp",  "title": "Curse of the Golden Flower (2006)","director": "Zhang Yimou",    "mode": "natural" },
+  { "filename": "HouseOfFlyingDaggers_vivid.webp",     "title": "House of Flying Daggers (2004)",   "director": "Zhang Yimou",    "mode": "vivid"  },
+  { "filename": "HouseOfFlyingDaggers_natural.webp",    "title": "House of Flying Daggers (2004)",   "director": "Zhang Yimou",    "mode": "natural" },
+  { "filename": "RaiseTheRedLantern_vivid.webp",       "title": "Raise the Red Lantern (1991)",     "director": "Zhang Yimou",    "mode": "vivid"  },
+  { "filename": "RaiseTheRedLantern_natural.webp",      "title": "Raise the Red Lantern (1991)",     "director": "Zhang Yimou",    "mode": "natural" },
+  { "filename": "Shadow_vivid.webp",                   "title": "Shadow (2018)",                    "director": "Zhang Yimou",    "mode": "vivid"  },
+  { "filename": "Shadow_natural.webp",                  "title": "Shadow (2018)",                    "director": "Zhang Yimou",    "mode": "natural" }
+]

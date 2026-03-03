@@ -1,0 +1,2 @@
+[console_scripts]
+moviebarcode = moviebarcode.cli:app
