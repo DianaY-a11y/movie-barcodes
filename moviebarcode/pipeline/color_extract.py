@@ -129,7 +129,7 @@ def _extract_single_shot(args: tuple) -> dict:
 
     # Open container once for this shot's frames
     try:
-        container = av.open(path)
+        container = av.open(path, metadata_errors="ignore")
         stream = container.streams.video[0]
     except Exception:
         return {}

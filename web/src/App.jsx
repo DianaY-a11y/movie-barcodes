@@ -17,26 +17,146 @@ function formatTime(seconds) {
   return `${s}s`
 }
 
+const GRAIN_COUNT = 60000
+
+function GrainCanvas() {
+  const canvasRef = useRef(null)
+  const stateRef  = useRef(null)  // { particles, colors, W, H }
+  const rafRef    = useRef(null)
+  const mouseRef  = useRef(null)  // { x, y } canvas-relative, or null
+
+  useEffect(() => {
+    fetch('/barcodes/ChungkingExpress_vivid.json')
+      .then(r => { if (!r.ok) throw new Error(); return r.json() })
+      .then(colors => {
+        const canvas = canvasRef.current
+        if (!canvas) return
+        const W = canvas.offsetWidth  || canvas.width
+        const H = canvas.offsetHeight || canvas.height
+        canvas.width  = W
+        canvas.height = H
+
+        const particles = Array.from({ length: GRAIN_COUNT }, () => {
+          const si    = Math.floor(Math.random() * colors.length)
+          const hex   = colors[si].hex
+          const r     = parseInt(hex.slice(1, 3), 16)
+          const g     = parseInt(hex.slice(3, 5), 16)
+          const b     = parseInt(hex.slice(5, 7), 16)
+          return {
+            homeX: (si / colors.length) * W,
+            y:     Math.random() * H,
+            vy:    0.2 + Math.random() * 0.45,
+            phase: Math.random() * Math.PI * 2,
+            amp:   3 + Math.random() * 10,
+            color: `${r},${g},${b}`,
+            alpha: 0.45 + Math.random() * 0.55,
+            sz:    1 + Math.random() * 1.5,
+          }
+        })
+
+        stateRef.current = { particles, colors, W, H }
+      })
+      .catch(() => {})
+
+    const tick = (time) => {
+      const canvas = canvasRef.current
+      const state  = stateRef.current
+      if (!canvas || !state) { rafRef.current = requestAnimationFrame(tick); return }
+
+      const { particles, W, H } = state
+
+      // Sync canvas size to CSS layout dimensions
+      const cW = canvas.offsetWidth
+      const cH = canvas.offsetHeight
+      if (cW !== canvas.width || cH !== canvas.height) {
+        canvas.width  = cW
+        canvas.height = cH
+        // Rescale homeX to new width
+        const colors = state.colors
+        particles.forEach(p => {
+          // Recover stripe index from old homeX then recompute
+          const si = Math.round((p.homeX / W) * (colors.length - 1))
+          p.homeX = (si / colors.length) * cW
+        })
+        state.W = cW
+        state.H = cH
+      }
+
+      const ctx = canvas.getContext('2d')
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+      const mouse = mouseRef.current
+      const RADIUS = 110
+
+      for (const p of particles) {
+        p.y += p.vy
+        if (p.y > state.H) p.y -= state.H
+
+        let x     = p.homeX + Math.sin(time * 0.0007 + p.phase) * p.amp
+        let alpha = p.alpha
+
+        if (mouse) {
+          const dx   = x - mouse.x
+          const dy   = p.y - mouse.y
+          const dist = Math.sqrt(dx * dx + dy * dy)
+          if (dist < RADIUS && dist > 0) {
+            const t     = 1 - dist / RADIUS
+            const force = t * 30
+            x     += (dx / dist) * force
+            alpha  = Math.min(1, alpha + t * 0.5)
+          }
+        }
+
+        ctx.fillStyle = `rgba(${p.color},${alpha})`
+        ctx.fillRect(x, p.y, p.sz, p.sz)
+      }
+
+      rafRef.current = requestAnimationFrame(tick)
+    }
+
+    rafRef.current = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(rafRef.current)
+  }, [])
+
+  const handleMouseMove = (e) => {
+    const rect = canvasRef.current?.getBoundingClientRect()
+    if (!rect) return
+    mouseRef.current = { x: e.clientX - rect.left, y: e.clientY - rect.top }
+  }
+
+  return (
+    <div className="grain-outer">
+      <div className="grain-wrap" onMouseMove={handleMouseMove} onMouseLeave={() => { mouseRef.current = null }}>
+        <canvas ref={canvasRef} className="grain-canvas" />
+      </div>
+      <p className="grain-label">Chungking Express &mdash; Wong Kar-wai</p>
+    </div>
+  )
+}
+
 function Intro() {
   return (
     <section className="intro snap-section">
-      <h1>Film<br />Barcode</h1>
-      <p className="intro-desc">
-        A movie barcode compresses an entire film into a single image.
-        Each vertical stripe is the dominant color of one scene —
-        a film's complete visual palette, collapsed into one frame.
-      </p>
-      <p className="intro-desc">
-        We collect two types of colors: the dominant, or natural, color of each scene, setting the overall tone of the scene, and the most vivid color, which reveals the scene's most striking hue.
-      </p>
-      <p className="intro-cta">
-        Generate your own with the{' '}
-        <a href="https://github.com/DianaY-a11y/movie-barcode-cli" target="_blank" rel="noopener noreferrer">
-          movie-barcode CLI
-        </a>
-        .
-      </p>
-      <div className="scroll-hint">↓</div>
+      <div className="intro-content">
+        <h1>Film<br />Barcode</h1>
+        <p className="intro-desc">
+          A movie barcode compresses an entire film into a single image.
+          Each vertical stripe is the dominant color of one scene —
+          a film's complete visual palette, collapsed into one frame.
+        </p>
+        <p className="intro-desc">
+          We collect two types of colors: the dominant, or natural, color of each scene, setting the overall tone of the scene, and the most vivid color, which reveals the scene's most striking hue.
+        </p>
+        <p className="intro-cta">
+          Generate your own with the{' '}
+          <a href="https://github.com/DianaY-a11y/movie-barcode-cli" target="_blank" rel="noopener noreferrer">
+            movie-barcode CLI
+          </a>
+          .
+        </p>
+        <div className="scroll-hint">↓</div>
+      </div>
+      <GrainCanvas />
     </section>
   )
 }
@@ -260,7 +380,8 @@ export default function App() {
 
   const handleFilter = (director) => {
     setSelectedDirector(director)
-    containerRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
+    const top = director === null ? 0 : window.innerHeight
+    containerRef.current?.scrollTo({ top, behavior: 'smooth' })
   }
 
   return (
