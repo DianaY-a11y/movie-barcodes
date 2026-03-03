@@ -31,7 +31,7 @@ function Intro() {
       </p>
       <p className="intro-cta">
         Generate your own with the{' '}
-        <a href="#" target="_blank" rel="noopener noreferrer">
+        <a href="https://github.com/DianaY-a11y/movie-barcode-cli" target="_blank" rel="noopener noreferrer">
           movie-barcode CLI
         </a>
         .
